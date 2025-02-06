@@ -4,9 +4,32 @@ import { Button } from "@/components/ui/button";
 import { PlusCircle } from 'lucide-react';
 import ProjectWizard from '@/components/ProjectWizard';
 import EmptyState from '@/components/EmptyState';
+import ProjectList from '@/components/ProjectList';
+
+interface Project {
+  id: string;
+  title: string;
+  description: string;
+  date: string;
+  progress: number;
+}
 
 const Index = () => {
   const [showWizard, setShowWizard] = useState(false);
+  const [projects, setProjects] = useState<Project[]>([]);
+
+  const handleProjectCreated = (projectData: any) => {
+    const newProject: Project = {
+      id: String(Date.now()),
+      title: projectData.projectName || "New Project",
+      description: projectData.description || "A new architectural project",
+      date: new Date().toLocaleDateString(),
+      progress: 0,
+    };
+    
+    setProjects((prev) => [...prev, newProject]);
+    setShowWizard(false);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-8">
@@ -22,10 +45,17 @@ const Index = () => {
           </Button>
         </div>
 
-        <EmptyState />
+        {projects.length === 0 ? (
+          <EmptyState />
+        ) : (
+          <ProjectList projects={projects} />
+        )}
 
         {showWizard && (
-          <ProjectWizard onClose={() => setShowWizard(false)} />
+          <ProjectWizard 
+            onClose={() => setShowWizard(false)} 
+            onComplete={handleProjectCreated}
+          />
         )}
       </div>
     </div>
