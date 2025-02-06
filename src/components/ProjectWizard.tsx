@@ -14,6 +14,7 @@ import { ArrowRight, ArrowLeft, X } from 'lucide-react';
 
 interface ProjectWizardProps {
   onClose: () => void;
+  onComplete: (projectData: any) => void;
 }
 
 const STEPS = [
@@ -46,7 +47,7 @@ const STEPS = [
   },
 ];
 
-const ProjectWizard = ({ onClose }: ProjectWizardProps) => {
+const ProjectWizard = ({ onClose, onComplete }: ProjectWizardProps) => {
   const [step, setStep] = useState(0);
   const [selectedCheckboxes, setSelectedCheckboxes] = useState<Record<number, string[]>>({});
   const [selectedSelects, setSelectedSelects] = useState<Record<number, Record<string, string>>>({});
@@ -56,6 +57,12 @@ const ProjectWizard = ({ onClose }: ProjectWizardProps) => {
   const handleNext = () => {
     if (step < STEPS.length - 1) {
       setStep(step + 1);
+    } else {
+      // When reaching the last step, call onComplete with the collected data
+      onComplete({
+        projectName: selectedSelects[0]?.["Project Scale"] || "",
+        description: `A ${selectedSelects[0]?.["Project Scale"]?.toLowerCase() || ""} scale project with ${selectedCheckboxes[0]?.join(", ") || "various"} features`
+      });
     }
   };
 
@@ -165,7 +172,7 @@ const ProjectWizard = ({ onClose }: ProjectWizardProps) => {
               Back
             </Button>
             <Button
-              onClick={step === STEPS.length - 1 ? onClose : handleNext}
+              onClick={step === STEPS.length - 1 ? handleNext : handleNext}
               className="bg-gray-900 hover:bg-gray-800 text-white transition-all duration-200"
             >
               {step === STEPS.length - 1 ? (
